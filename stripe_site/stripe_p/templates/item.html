@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Buy item</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+
+<div class="header">
+    <li><a href="/">Главная страница</a></li>
+</div>
+
+<div class="product-wrap">
+  <div class="product-item">
+    <img src="https://i-smart.by/image/unnamed%20(2).jpg">
+    <div class="product-buttons">
+      <a id="checkout-button" class="button">Buy</a>
+    </div>
+  </div>
+  <div class="product-title">
+    <a>{{ product.name }}</a>
+      <a>{{ product.description }}</a>
+    <span class="product-price">${{ product.get_str_to_dollars }}</span>
+  </div>
+</div>
+
+{% csrf_token %}
+
+<script type="text/javascript">
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    let stripe = Stripe("{{ STRIPE_PUBLIC_KEY }}");
+    let checkoutButton = document.getElementById("checkout-button");
+    checkoutButton.addEventListener("click", function () {
+        fetch("{% url 'create-checkout-session' product.id %}", {
+            method: "POST",
+            headers: {
+                'X-CSRFToken': csrftoken
+            }
+        })
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (session) {
+                return stripe.redirectToCheckout({sessionId: session.id});
+            })
+            .then(function (result) {
+                if (result.error) {
+                    alert(result.error.message);
+                }
+            })
+            .catch(function (error) {
+                console.error("Error:", error);
+            });
+    });
+</script>
+</body>
+</html>
