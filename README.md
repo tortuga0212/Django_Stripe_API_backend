@@ -27,7 +27,7 @@ pip freeze > requirements.txt
 ```
 На официальном сайте stripe https://dashboard.stripe.com/test/apikeys берем Publishable key и Secret key, добавляем их в settings.py
 Добавляем stripe_p.apps.StripePConfig в settings.py -> INSTALLED_APPS.
-Модель продукта Product будет содержать только то, что необходимо для интеграции с Stripe.
+Модель продукта Item будет содержать только то, что необходимо для интеграции с Stripe.
 
 ```bash
 from django.db import models
@@ -70,7 +70,7 @@ class SuccessView(TemplateView):
 class CancelView(TemplateView):
     template_name = "cancel.html"
 ```
-Передаем эти представления в конфигурацию корневого URL в urls.py.
+Создадим urls.py в папке приложения с urlpatterns. Передаем эти представления в конфигурацию корневого URL в urls.py.
 Создаем папку templates с 4 файлами html:
  - для главной страницы - home.html,
  - для страницы перехода на товар - item.html,
